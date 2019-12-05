@@ -58,10 +58,19 @@ void DiffWorkerCallback::HandleProgressCallback(const int* data, size_t count)
 {
     if(data != nullptr)
     {
+        size_t size = 100;
+        char *CharBuff = new char[size + 1];
+        v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+
+        if (result.IsEmpty()) {
+            return;
+        }
+
         Nan::HandleScope scope;
         v8::Local<v8::Value> argv[] = {
             v8::Number::New(v8::Isolate::GetCurrent(), *data),
-            v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), _error.c_str())
+            // v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), _error.c_str())
+            result.ToLocalChecked()
         };
 
         callback->Call(2, argv, this->async_resource);
@@ -70,9 +79,17 @@ void DiffWorkerCallback::HandleProgressCallback(const int* data, size_t count)
 
 void DiffWorkerCallback::HandleOKCallback() 
 {
+    size_t size = 100;
+    char *CharBuff = new char[size + 1];
+    v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+
+    if (result.IsEmpty()) {
+        return;
+    }
+
     v8::Local<v8::Value> argv[] = { 
         v8::Number::New(v8::Isolate::GetCurrent(), 100),
-        v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), _error.c_str()) 
+        result.ToLocalChecked()
     };
     callback->Call(2, argv, this->async_resource);
 }

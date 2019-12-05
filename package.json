@@ -10,6 +10,8 @@
   "scripts": {
     "test": "mocha",
     "install": "node-pre-gyp install --fallback-to-build || node-gyp rebuild",
+    "dev": "node-pre-gyp install --fallback-to-build || node-gyp rebuild",
+    "e-rebuild": "electron-rebuild",
     "install-verbose": "node-gyp rebuild --verbose",
     "predeploy": "node-pre-gyp rebuild && node-pre-gyp package",
     "deploy": "node-pre-gyp-github publish --release || exit 0"
@@ -34,6 +36,8 @@
   "license": "MIT",
   "gypfile": true,
   "dependencies": {
+    "electron": "^7.1.3",
+    "electron-rebuild": "^1.8.8",
     "nan": "^2.14.0",
     "node-pre-gyp": "^0.14.0"
   },

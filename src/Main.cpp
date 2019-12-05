@@ -35,13 +35,17 @@ extern "C" {
 namespace bsdpNode {
   using namespace v8;
 
+  size_t size = 100;
+  char *CharBuff = new char[size + 1];
+
   void diff(const FunctionCallbackInfo<Value>& args) 
   {
     Isolate* isolate = args.GetIsolate();
 
     if(args.Length() < 4 || !args[0]->IsString() || !args[1]->IsString() || !args[2]->IsString()) 
     {
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Invalid arguments.")));
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked()));
       return;
     }
     
@@ -67,7 +71,8 @@ namespace bsdpNode {
     
     if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsString()) 
     {
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Invalid arguments.")));
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked()));
       return;
     }
     
@@ -81,8 +86,10 @@ namespace bsdpNode {
 
     int ret = bsdiff(error, *oldfile, *newfile, *patchfile, nullptr, nullptr); 
 
-    if(ret != 0) 
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, error)));       
+    if(ret != 0) {
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked()));
+    }
   }
 
   void patch(const FunctionCallbackInfo<Value>& args) 
@@ -91,7 +98,8 @@ namespace bsdpNode {
 
     if(args.Length() < 4 || !args[0]->IsString() || !args[1]->IsString() || !args[2]->IsString()) 
     {
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Invalid arguments.")));
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked()));
       return;
     }
     
@@ -117,7 +125,11 @@ namespace bsdpNode {
 
     if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsString()) 
     {
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Invalid arguments.")));
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      if (result.IsEmpty()) {
+          return;
+      }
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked()));
       return;
     }
     
@@ -130,9 +142,15 @@ namespace bsdpNode {
 
     int ret = bspatch(error, *oldfile, *newfile, *patchfile, nullptr, nullptr);  
 
-    if(ret != 0)
-      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, error))); 
+    if(ret != 0) {
+      v8::MaybeLocal<v8::String> result = v8::String::NewFromUtf8(isolate, CharBuff, v8::NewStringType::kNormal, static_cast<int>(size));
+      if (result.IsEmpty()) {
+          return;
+      }
+      isolate->ThrowException(Exception::Error(result.ToLocalChecked())); 
+    }
   }
+
 
   void init(Local<Object> exports, Local<Object> module) {
     NODE_SET_METHOD(exports, "diff", diff);
